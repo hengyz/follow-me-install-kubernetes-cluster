@@ -122,6 +122,9 @@ etcdctl \
   mk ${FLANNEL_ETCD_PREFIX}/config '{"Network":"'${CLUSTER_CIDR}'", "SubnetLen": 21, "Backend": {"Type": "vxlan"}}'
 ```
 + flanneld **当前版本 (v0.11.0) 不支持 etcd v3**，故使用 etcd v2 API 写入配置 key 和网段数据；
++ 更新 /etc/systemd/system/etcd.service 文件 在--election-timeout=2000 后边增加“\ --enable-v2=true”，并重启：systemctl daemon-reload, systemctl restart etcd.service
++ environment.sh 中添加：export FLANNEL_ETCD_PREFIX="/kubernetes/network" 并更新同步到其他几个节点
++ 所有的etcdctl 前面加上 ETCDCTL_API=2 
 + 写入的 Pod 网段 `${CLUSTER_CIDR}` 地址段（如 /16）必须小于 `SubnetLen`，必须与 `kube-controller-manager` 的 `--cluster-cidr` 参数值一致；
 
 ## 创建 flanneld 的 systemd unit 文件
